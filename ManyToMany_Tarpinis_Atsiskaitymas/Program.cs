@@ -1,6 +1,7 @@
-﻿// See https://aka.ms/new-console-template for more information
-using ManyToMany_Tarpinis_Atsiskaitymas;
+﻿using ManyToMany_Tarpinis_Atsiskaitymas.Display;
+using ManyToMany_Tarpinis_Atsiskaitymas.InputToDB;
 using Microsoft.EntityFrameworkCore;
+using ManyToMany_Tarpinis_Atsiskaitymas.DataBase;
 
 internal class Program
 {
@@ -21,9 +22,6 @@ internal class Program
         +Validacija atliekama prieš įrašant duomenis į duomenų bazę.
         +Visuose veiksmuose tikrinama ar nėra Null.
          */
-        var dbContext = new DbContextContext(new DbContextOptionsBuilder<DbContextContext>()
-                .UseSqlServer($"Server=(localdb)\\mssqllocaldb;Database=University_Students_Schedual;Trusted_Connection=True;")
-                .Options);
         while (true)
         {
             Meniu();
@@ -38,63 +36,78 @@ internal class Program
                 {
                     case ChooseAction.Exit:
                         Console.WriteLine("Aciu");
-                        Thread.Sleep(5000);
+                        Thread.Sleep(500);
                         Environment.Exit(0);
                         break;
-                        //ok
+
                     case ChooseAction.CreatDepartment:      //sukuriamas naujas departamentas
                         DepartmentToDB.AddDepartment();
+                        Console.Clear();
                         break;
 
-                        //mail validacija patikrinti                       
+
                     case ChooseAction.CreateLesson:         //sukuriama nauaja paskaita
                         LessonToDB.AddLessonToDB();
+                        Console.Clear();
                         break;
 
-                        //ok
+
                     case ChooseAction.CreateStudent:                //sukuriamas naujas studentas
                         StudentToDB.AddNewStudentsNameAndSurname(); //ir pridedamas prie departamento
+                        Console.Clear();
                         break;
 
-                        //nesutvarkyta
-                        //patikrinti mail verifikacija
-                       
+
                     case ChooseAction.AddLessontoStudent:           //pridedama paskaita prie departamento
                         LessonToDB.AddLessonToStudent();
+                        Console.Clear();
                         break;
 
-                        //ok
+                    //ok
                     case ChooseAction.MoveExistingLessonToDepartment:   //esamos paskaitos perkelimas i kita departamenta
-                        DepartmentToDB.ChangeLessonsDepartment();
+                        DepartmentToDB.AddLessonToDepartment();
+                        Console.Clear();
                         break;
 
-                        //ok
-                    case ChooseAction.MoveExistingStudentToDepartment:  //esamo studento perkelimas i kita departamenta
+                    //ok
+                    case ChooseAction.MoveExistingStudentToDepartment:  //esamo studento perkelimas i kita departamenta                         
                         DepartmentToDB.ChangeStudentsDepartment();
+                        Console.Clear();
                         break;
 
-                        //ok
-                    case ChooseAction.RepresentStudentsByDepartment:    //studentu atvaizdavimas pagal departaenta
-                        RepresentToScrean.RepresentStudentByDepartment();
+                    //ok
+                    case ChooseAction.DisplayStudentsByDepartment:    //studentu atvaizdavimas pagal departaenta
+                        DisplayToScrean.DisplayStudentByDepartment();                        
+                        Console.ReadLine();
+                        Console.Clear();
                         break;
 
-                        //ok
-                    case ChooseAction.RepresentLessonsByStudent:        //paskaitu atvaizdavimas pagal studenta
-                        RepresentToScrean.RepreentLessonsByStudent();
+                    //ok
+                    case ChooseAction.DisplayLessonsByStudent:        //paskaitu atvaizdavimas pagal studenta
+                        
+                        DisplayToScrean.DisplayLessonsByStudent();
+                        Console.ReadLine();
+                        Console.Clear();
                         break;
 
-                        //ok
-                    case ChooseAction.RepresentLessonByDepartment:      //paskaitu atvaizdavimas pagal departamenta
-                        RepresentToScrean.RepresentLessonByDepartment();
+                    //ok
+                    case ChooseAction.DisplayLessonByDepartment:      //paskaitu atvaizdavimas pagal departamenta
+                        DisplayToScrean.DisplayLessonByDepartment();
+                        Console.ReadLine();
+                        Console.Clear();
                         break;
 
-                        //ok
-                    case ChooseAction.RepresentDepartment:              //viso departamento atvaizdavimas   
-                        RepresentToScrean.RepresentDepartmentInConsole();
+                    //ok
+                    case ChooseAction.DisplayDepartment:              //viso departamento atvaizdavimas   
+                        DisplayToScrean.DisplayDepartmentInConsole();
+                        Console.ReadLine();
+                        Console.Clear();
                         break;
 
                     default:
                         Console.WriteLine("Netinkamas pasirinkitmas");
+                        Thread.Sleep(1000);
+                        Console.Clear();
                         break;
                 }
             }
@@ -113,10 +126,10 @@ internal class Program
         AddLessontoStudent,                 // 4 
         MoveExistingLessonToDepartment,     // 5
         MoveExistingStudentToDepartment,    // 6   
-        RepresentStudentsByDepartment,      // 7
-        RepresentLessonsByStudent,          // 8
-        RepresentLessonByDepartment,        // 9
-        RepresentDepartment                 // 10
+        DisplayStudentsByDepartment,      // 7
+        DisplayLessonsByStudent,          // 8
+        DisplayLessonByDepartment,        // 9
+        DisplayDepartment                 // 10
     }
     public static void Meniu()
     {
@@ -125,7 +138,7 @@ internal class Program
     "2) Prideti Paskaita",
     "3) Prideti studenta",
     "4) Prideti studentui paskaita",
-    "5) Perkelti paskaita i kita departamenta",
+    "5) Prideti departamentui paskaita",
     "6) Pakeisti studentui departamenta",
     "7) Atvaizduoti studentus pagal departamenta",
     "8) Atvaizduoti studento paskaitas",

@@ -1,25 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ManyToMany_Tarpinis_Atsiskaitymas.InputToDB;
+using ManyToMany_Tarpinis_Atsiskaitymas.InputValidatio;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.Design;
+using ManyToMany_Tarpinis_Atsiskaitymas.DataBase;
 
-namespace ManyToMany_Tarpinis_Atsiskaitymas
+namespace ManyToMany_Tarpinis_Atsiskaitymas.Display
 {
-    public class RepresentToScrean
+    public class DisplayToScrean
     {
-        public static void RepresentLessonByDepartment()
+        public static void DisplayLessonByDepartment()
         {
             Console.WriteLine("Kurio departamento paskaitas norite pamatyti");
             var departmentId = Console.ReadLine();
 
-            if (departmentId != null
-                && DepartmentToDB.CheckDepartmentID(departmentId))
+            if (InputValidation.ValidateStringNull(departmentId)
+                && InputValidation.ValidateDepartmentID(departmentId))
             {
                 var dbContext = new DbContextContext();
                 Department department = dbContext.Departments
+                    .Include(a => a.Lessons)
                    .FirstOrDefault(b => b.DepartmentId == departmentId);
 
-                if (department != null)
+                if (InputValidation.CheckIsDepartmentExist(departmentId))
                 {
-
                     foreach (var lesson in department.Lessons)
                     {
                         Console.WriteLine(string.Join(Environment.NewLine,
@@ -29,6 +32,7 @@ namespace ManyToMany_Tarpinis_Atsiskaitymas
                             $"Lesson Data and time: {lesson.LessonDateAndTime}"));
                         Console.WriteLine("---------------------------------------------------------------------------------------------");
                     }
+                    
                 }
                 else
                 {
@@ -40,9 +44,8 @@ namespace ManyToMany_Tarpinis_Atsiskaitymas
                 Console.WriteLine("Iveskite departamento numeri");
             }
         } //atspausdina pagal departamenta susijusias lesson
-        public static void RepresentDepartmentInConsole()
+        public static void DisplayDepartmentInConsole()
         {
-
             var dbContext = new DbContextContext();
             List<Department> allDepartments = dbContext.Departments.ToList();
 
@@ -52,8 +55,9 @@ namespace ManyToMany_Tarpinis_Atsiskaitymas
                                 $" DepartmentName: {department.DepartmentName}");
                 Console.WriteLine("---------------------------------------------------------------------------------------------");
             }
+            Console.ReadLine();
         }//atspausdina visa departamenta i Console
-        public static void RepreentLessonsByStudent()
+        public static void DisplayLessonsByStudent()
         {
             Console.WriteLine("Kurio studento paskaitas norite pamatyti");
             var inputStudentId = Console.ReadLine();
@@ -63,49 +67,45 @@ namespace ManyToMany_Tarpinis_Atsiskaitymas
             {
                 if (int.TryParse(inputStudentId, out int id))
                 {
-                    using var dbContext = new DbContextContext();
+                    var dbContext = new DbContextContext();
                     Student student = dbContext.Students
-                    .FirstOrDefault(b => b.StudentId == id);
+                        .Include(x => x.Lessons)
+                        .FirstOrDefault(b => b.StudentId == id);
 
-                    if (student != null)
+                    if (InputValidation.CheckIsStudentExistTrue(id))
                     {
                         foreach (var lesson in student.Lessons)
                         {
                             Console.WriteLine(string.Join(Environment.NewLine,
-                                $"DepartmentId: {id}",
+                                $"Studento Id: {id}",
                                 $"Lesson Id: {lesson.LessonId}",
                                 $"Lesson Name: {lesson.LessonName}",
                                 $"Lesson Data and time: {lesson.LessonDateAndTime}"));
                             Console.WriteLine("---------------------------------------------------------------------------------------------");
-                        }
+                        }                       
                     }
-                    else
-                    {
-                        Console.WriteLine($"Studentas {id} nerastas.");
-                    }
+
                 }
                 else
                 {
                     Console.WriteLine("Iveskite tinkama studento ID");
                 }
             }
-            else
-            {
-                Console.WriteLine("Iveskite studento ID");
-            }
         } //atspausdina pagal departamenta susijusias lesson
-        public static void RepresentStudentByDepartment()
+        public static void DisplayStudentByDepartment()
         {
             Console.WriteLine("Kurio departamento studentus norite pamatyti");
             var departmentId = Console.ReadLine();
 
-            if (departmentId != null
-                && DepartmentToDB.CheckDepartmentID(departmentId))
+            if (InputValidation.ValidateStringNull(departmentId)
+                && InputValidation.ValidateDepartmentID(departmentId))
             {
                 var dbContext = new DbContextContext();
                 Department department = dbContext.Departments
+                    .Include(a => a.Students)
                     .FirstOrDefault(b => b.DepartmentId == departmentId);
-                if (department != null)
+
+                if (InputValidation.CheckIsDepartmentExist(departmentId))
                 {
                     foreach (var student in department.Students)
                     {
@@ -115,21 +115,14 @@ namespace ManyToMany_Tarpinis_Atsiskaitymas
                                     $"Student Name: {student.StudentName}",
                                     $"Student SurName: {student.StudentSurName}"));
                         Console.WriteLine("---------------------------------------------------------------------------------------------");
+
                     }
+
                 }
-                else
-                {
-                    Console.WriteLine($"Departamentas {departmentId} nerastas");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Iveskite departamento numeri");
+                
             }
 
         }//atspausdina studentus pagal departamenta
-
-
     }
 }
 
